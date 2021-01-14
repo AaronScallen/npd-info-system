@@ -1,4 +1,5 @@
 import admin from 'firebase-admin';
+
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
@@ -9,4 +10,8 @@ if (!admin.apps.length) {
     databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL
   });
 }
-export default admin.firestore();
+
+const db = admin.firestore()
+const auth = admin.auth()
+
+export { db, auth }

@@ -5,27 +5,36 @@ import { createUser } from "./db";
 
 
 const authContext = createContext()
+
 export function AuthProvider({ children }) {
   const auth = useProvideAuth()
   return <authContext.Provider value={auth}>{children}</authContext.Provider>
 }
+
 export const useAuth = () => {
   return useContext(authContext)
-}
+};
+
 function useProvideAuth() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const handleUser = (rawUser) => {
-    if (rawUser) {
-      const user = formatUser(rawUser)
 
-      createUser(user.uid, user)
-      setLoading(false)
+  const handleUser = async (rawUser) => {
+    if (rawUser) {
+      const user = await formatUser(rawUser)
+      const {token, ...userWithoutToken } = user;
+
+      createUser(user.uid, userWithoutToken)
       setUser(user)
-      return user
-    } else {
+
+
       setLoading(false)
+      return user;
+    } else {
       setUser(false)
+
+            setLoading(false)
+
       return false
     }
   }
@@ -67,11 +76,12 @@ function useProvideAuth() {
     signout,
   }
 }
-const formatUser = (user) => {
+const formatUser = async (user) => {
   return {
     uid: user.uid,
     email: user.email,
     name: user.displayName,
+    token: user.xa,
     provider: user.providerData[0].providerId,
     photoUrl: user.photoURL,
   }
